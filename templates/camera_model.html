@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ model }} - Dashboard de Câmeras</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/boxicons@2.0.7/css/boxicons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav class="col-md-3 col-lg-2 d-md-block bg-dark sidebar collapse">
+                <div class="position-sticky pt-3">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href="/">
+                                <i class='bx bxs-dashboard'></i>
+                                Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active text-white" href="/camera/{{ model }}">
+                                <i class='bx bxs-camera'></i>
+                                {{ model }}
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <div>
+                        <a href="/" class="btn btn-outline-secondary mb-2"><i class='bx bx-arrow-back'></i> Voltar para Modelos</a>
+                        <h1 class="h2 d-inline ms-2">{{ model }}</h1>
+                    </div>
+                </div>
+
+                <!-- Informações do Modelo -->
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">Informações do Modelo</h5>
+                                <img id="modelImage" class="img-fluid mb-3" alt="{{ model }}">
+                                <div id="model-info">
+                                    <!-- Preenchido via JavaScript -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">Planta Baixa com Instalações</h5>
+                                <div id="floor-map" style="height: 400px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gráficos -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">Ocorrências por Período</h5>
+                                <div id="incidents-chart" style="height: 300px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">Armazenamento por Câmera</h5>
+                                <div id="storage-chart" style="height: 300px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal para detalhes da câmera -->
+    <div class="modal fade" id="cameraModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Detalhes da Câmera</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="camera-details">
+                    <!-- Preenchido via JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script>
+    // Buscar e exibir imagem e descrição do modelo
+    async function fetchModelDetails() {
+        const modelName = "{{ model }}";
+        const res = await fetch('/api/models');
+        const models = await res.json();
+        const found = models.find(m => m.name === modelName);
+        if (found) {
+            document.getElementById('modelImage').src = '/static/images/models/' + found.image_path;
+            document.getElementById('modelImage').alt = found.name;
+            // Se quiser exibir a descrição:
+            const infoDiv = document.getElementById('model-info');
+            infoDiv.innerHTML = `<div class='mb-2'><b>Descrição:</b> ${found.description}</div>` + infoDiv.innerHTML;
+        }
+    }
+    document.addEventListener('DOMContentLoaded', fetchModelDetails);
+    </script>
+    <script src="{{ url_for('static', filename='js/camera_model.js') }}"></script>
+</body>
+</html> 
